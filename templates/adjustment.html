@@ -1,0 +1,343 @@
+<!-- adjustment.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{.Title}}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-[#F5F7FB] min-h-screen p-10">
+
+<div class="max-w-7xl mx-auto">
+
+    <!-- ====================================================== -->
+    <!-- HEADER -->
+    <!-- ====================================================== -->
+    <div class="flex justify-between items-center mb-8">
+
+        <!-- LEFT -->
+        <div>
+
+            <h1 class="text-5xl font-bold text-[#0B1F3A]">
+                Adjustment Approval
+            </h1>
+
+            <p class="text-gray-500 mt-2 text-lg">
+                Manager stock adjustment approval center
+            </p>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="flex items-center gap-4">
+
+            <!-- LOGIN USER -->
+            <div class="bg-white px-6 py-4 rounded-2xl shadow-lg">
+
+                <div class="text-sm text-gray-500">
+                    Login User
+                </div>
+
+                <div class="text-lg font-bold text-[#0B1F3A] mt-1">
+                    {{.LoginUser}}
+                </div>
+
+                <div class="text-sm text-pink-500 mt-1">
+                    {{.LoginRole}}
+                </div>
+
+            </div>
+
+            <!-- DOWNLOAD -->
+            <a
+                href="/adjustment/export"
+                class="bg-green-500 hover:bg-green-600 text-white px-6 py-4 rounded-2xl font-bold shadow-lg transition"
+            >
+                ⬇ Download CSV
+            </a>
+
+            <!-- BACK -->
+            <a
+                href="/inventory"
+                class="bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-6 py-4 rounded-2xl font-semibold transition"
+            >
+                ← Back Inventory
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- SUMMARY -->
+    <!-- ====================================================== -->
+    <div class="flex justify-between items-center mb-8">
+
+        <!-- TOTAL -->
+        <div class="bg-white rounded-3xl shadow-lg px-8 py-6">
+
+            <div class="text-gray-500 text-sm">
+                Total Adjustment Data
+            </div>
+
+            <div class="text-5xl font-bold text-[#0B1F3A] mt-2">
+                {{len .Adjustments}}
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- TABLE -->
+    <!-- ====================================================== -->
+    <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-pink-100">
+
+        <!-- TOP -->
+        <div class="bg-[#0B1F3A] px-8 py-6 flex justify-between items-center">
+
+            <div>
+
+                <h2 class="text-3xl font-bold text-pink-200">
+                    Adjustment History
+                </h2>
+
+                <p class="text-pink-100 text-sm mt-1">
+                    All stock adjustment activity records
+                </p>
+
+            </div>
+
+            <div class="bg-pink-200 text-[#0B1F3A] px-5 py-2 rounded-xl font-bold">
+
+                Total:
+                {{len .Adjustments}}
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+        <div class="overflow-auto">
+
+            <table class="w-full min-w-[1400px]">
+
+                <!-- HEAD -->
+                <thead class="bg-pink-50">
+
+                    <tr>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Product
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Location
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Qty
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Type
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Reason
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Request By
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Approved By
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Date
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Status
+                        </th>
+
+                        <th class="p-5 text-center font-bold text-[#0B1F3A]">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <!-- BODY -->
+                <tbody>
+
+                    {{range .Adjustments}}
+
+                    <tr class="border-b hover:bg-pink-50 transition">
+
+                        <!-- PRODUCT -->
+                        <td class="p-5 font-semibold text-[#0B1F3A] whitespace-nowrap">
+                            {{.Product}}
+                        </td>
+
+                        <!-- LOCATION -->
+                        <td class="p-5">
+
+                            <span class="bg-[#0B1F3A] text-pink-200 px-4 py-2 rounded-full text-sm font-semibold">
+                                {{.Location}}
+                            </span>
+
+                        </td>
+
+                        <!-- QTY -->
+                        <td class="p-5 font-bold text-xl text-[#0B1F3A]">
+                            {{.Qty}}
+                        </td>
+
+                        <!-- TYPE -->
+                        <td class="p-5">
+
+                            {{if eq .Type "PLUS"}}
+
+                            <span class="bg-green-100 text-green-600 px-4 py-2 rounded-full text-sm font-bold">
+                                PLUS
+                            </span>
+
+                            {{else}}
+
+                            <span class="bg-red-100 text-red-600 px-4 py-2 rounded-full text-sm font-bold">
+                                MINUS
+                            </span>
+
+                            {{end}}
+
+                        </td>
+
+                        <!-- REASON -->
+                        <td class="p-5 text-gray-700">
+                            {{.Reason}}
+                        </td>
+
+                        <!-- REQUEST -->
+                        <td class="p-5">
+
+                            <div class="font-bold text-pink-500 whitespace-nowrap">
+                                {{.User}}
+                            </div>
+
+                        </td>
+
+                        <!-- APPROVED -->
+                        <td class="p-5">
+
+                            <div class="font-semibold text-[#0B1F3A] whitespace-nowrap">
+
+                                {{if .ApprovedBy}}
+
+                                    {{.ApprovedBy}}
+
+                                {{else}}
+
+                                    -
+
+                                {{end}}
+
+                            </div>
+
+                        </td>
+
+                        <!-- DATE -->
+                        <td class="p-5 text-gray-600 whitespace-nowrap">
+                            {{.CreatedAt}}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td class="p-5">
+
+                            {{if eq .Status "PENDING"}}
+
+                            <span class="bg-yellow-100 text-yellow-600 px-4 py-2 rounded-full text-sm font-bold">
+                                PENDING
+                            </span>
+
+                            {{else if eq .Status "APPROVED"}}
+
+                            <span class="bg-green-100 text-green-600 px-4 py-2 rounded-full text-sm font-bold">
+                                APPROVED
+                            </span>
+
+                            {{else}}
+
+                            <span class="bg-red-100 text-red-600 px-4 py-2 rounded-full text-sm font-bold">
+                                REJECTED
+                            </span>
+
+                            {{end}}
+
+                        </td>
+
+                        <!-- ACTION -->
+                        <td class="p-5">
+
+                            {{if eq .Status "PENDING"}}
+
+                            <div class="flex justify-center gap-3">
+
+                                <!-- APPROVE -->
+                                <a
+                                    href="/adjustment/approve/{{.ID}}"
+                                    class="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-xl font-bold transition"
+                                >
+                                    Approve
+                                </a>
+
+                                <!-- REJECT -->
+                                <a
+                                    href="/adjustment/reject/{{.ID}}"
+                                    class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-bold transition"
+                                >
+                                    Reject
+                                </a>
+
+                            </div>
+
+                            {{else}}
+
+                            <div class="text-center text-gray-400 font-semibold">
+                                DONE
+                            </div>
+
+                            {{end}}
+
+                        </td>
+
+                    </tr>
+
+                    {{end}}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

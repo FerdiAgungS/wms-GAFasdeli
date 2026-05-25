@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <link
+        rel="icon"
+        type="image/png"
+        href="/static/img/logo.jpg"
+    >
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F5F7FB] p-10">
+
+<div class="max-w-7xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-8">
+
+        <a
+            href="/"
+            class="bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-5 py-3 rounded-xl font-semibold"
+        >
+            Back
+        </a>
+
+        <div class="text-right">
+
+            <h1 class="text-4xl font-bold text-[#0B1F3A]">
+                Product Master
+            </h1>
+
+            <p class="text-gray-500 mt-1">
+                Product management
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- CREATE PRODUCT -->
+    <div class="bg-white rounded-3xl shadow-lg border border-pink-100 p-8 mb-8">
+
+        <div class="mb-6">
+
+            <h2 class="text-2xl font-bold text-[#0B1F3A]">
+                Create Product
+            </h2>
+
+            <p class="text-gray-500 mt-1">
+                Add new product manually
+            </p>
+
+        </div>
+
+        <form action="/products/add" method="POST">
+
+            <div class="grid grid-cols-5 gap-5">
+
+                <!-- SKU -->
+                <div>
+
+                    <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                        SKU
+                    </label>
+
+                    <input
+                        type="text"
+                        name="sku"
+                        placeholder="SKU"
+                        class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                    >
+
+                </div>
+
+                <!-- PRODUCT NAME -->
+                <div>
+
+                    <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                        Product Name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Product Name"
+                        class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                    >
+
+                </div>
+
+                <!-- UOM -->
+                <div>
+
+                    <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                        UOM
+                    </label>
+
+                    <input
+                        type="text"
+                        name="uom"
+                        placeholder="UOM"
+                        class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                    >
+
+                </div>
+
+                <!-- MIN -->
+                <div>
+
+                    <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                        Min Stock
+                    </label>
+
+                    <input
+                        type="number"
+                        name="min_stock"
+                        placeholder="Min Stock"
+                        class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                    >
+
+                </div>
+
+                <!-- MAX -->
+                <div>
+
+                    <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                        Max Stock
+                    </label>
+
+                    <input
+                        type="number"
+                        name="max_stock"
+                        placeholder="Max Stock"
+                        class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                    >
+
+                </div>
+
+            </div>
+
+            <!-- BUTTON -->
+            <button
+                class="mt-6 bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-8 py-3 rounded-xl font-semibold"
+            >
+                Add Product
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- UPLOAD CSV -->
+    <div class="bg-white rounded-3xl shadow-lg border border-pink-100 p-8 mb-8">
+
+        <div class="flex justify-between items-center mb-6">
+
+            <div>
+
+                <h2 class="text-2xl font-bold text-[#0B1F3A]">
+                    Upload
+                </h2>
+
+                <p class="text-gray-500 mt-1">
+                    Bulk upload product data
+                </p>
+
+            </div>
+
+            <a
+                href="/products/template"
+                class="bg-pink-300 hover:bg-pink-400 text-[#0B1F3A] px-5 py-3 rounded-xl font-semibold"
+            >
+                Download Template
+            </a>
+
+        </div>
+
+        <form
+            action="/products/upload"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <div class="flex gap-4">
+
+                <input
+                    type="file"
+                    name="file"
+                    class="border border-pink-200 p-3 rounded-xl w-full"
+                >
+
+                <button
+                    class="bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-8 rounded-xl font-semibold"
+                >
+                    Upload
+                </button>
+
+            </div>
+
+        </form>
+
+        <div class="mt-4 text-sm text-gray-500">
+
+            CSV Format:
+            SKU, NAME, UOM, MIN_STOCK, MAX_STOCK
+
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-pink-100">
+
+        <!-- TOP -->
+        <div class="bg-[#0B1F3A] px-8 py-5 flex justify-between items-center">
+
+            <div>
+
+                <h2 class="text-2xl font-bold text-pink-200">
+                    Product List
+                </h2>
+
+                <p class="text-pink-100 text-sm mt-1">
+                    All registered warehouse products
+                </p>
+
+            </div>
+
+            <div class="bg-pink-200 text-[#0B1F3A] px-5 py-2 rounded-xl font-bold">
+
+                Total Product:
+                {{len .Products}}
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+        <div class="overflow-auto">
+
+            <table class="w-full">
+
+                <thead class="bg-pink-50">
+
+                    <tr>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            SKU
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            Product
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            UOM
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            Min
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            Max
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            Stock
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            Status
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {{range .Products}}
+
+                    <tr class="border-b hover:bg-pink-50 transition duration-150">
+
+                        <!-- SKU -->
+                        <td class="p-5 font-semibold text-[#0B1F3A]">
+                            {{.SKU}}
+                        </td>
+
+                        <!-- PRODUCT -->
+                        <td class="p-5 text-gray-700">
+                            {{.Name}}
+                        </td>
+
+                        <!-- UOM -->
+                        <td class="p-5 text-gray-700">
+                            {{.UOM}}
+                        </td>
+
+                        <!-- MIN -->
+                        <td class="p-5">
+                            {{.MinStock}}
+                        </td>
+
+                        <!-- MAX -->
+                        <td class="p-5">
+                            {{.MaxStock}}
+                        </td>
+
+                        <!-- STOCK -->
+                        <td class="p-5 font-bold text-xl text-[#0B1F3A]">
+                            {{.Qty}}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td class="p-5">
+
+                            {{if eq .Status "LOW"}}
+
+                            <span class="bg-red-100 text-red-600 px-4 py-2 rounded-full text-sm font-bold">
+                                LOW
+                            </span>
+
+                            {{else}}
+
+                            <span class="bg-green-100 text-green-600 px-4 py-2 rounded-full text-sm font-bold">
+                                NORMAL
+                            </span>
+
+                            {{end}}
+
+                        </td>
+
+                        <!-- ACTION -->
+                        <td class="p-5">
+
+                            <a
+                                href="/products/delete/{{.ID}}"
+                                class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-semibold"
+                                onclick="return confirm('Delete product?')"
+                            >
+                                Delete
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {{end}}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

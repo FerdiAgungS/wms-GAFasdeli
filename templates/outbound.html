@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Outbound</title>
+    <link
+        rel="icon"
+        type="image/png"
+        href="/static/img/logo.jpg"
+    >
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F5F7FB] p-10">
+
+<div class="max-w-7xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-8">
+
+        <!-- LEFT -->
+        <div class="flex items-center gap-3">
+
+            <a
+                href="/"
+                class="bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-5 py-3 rounded-xl font-semibold"
+            >
+                Back
+            </a>
+
+            <a
+                href="/outbound/history"
+                class="bg-pink-300 hover:bg-pink-400 text-[#0B1F3A] px-5 py-3 rounded-xl font-semibold"
+            >
+                History
+            </a>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="text-right">
+
+            <h1 class="text-4xl font-bold text-[#0B1F3A]">
+                Outbound
+            </h1>
+
+            <p class="text-gray-500 mt-1">
+                Stock outgoing process
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- SUCCESS -->
+    {{if .Success}}
+
+    <div class="bg-green-100 border border-green-200 text-green-700 p-5 rounded-2xl mb-8 shadow">
+
+        <div class="text-xl font-bold mb-2">
+            ✅ Outbound Success
+        </div>
+
+        <div class="text-lg">
+            Surat Jalan:
+            <span class="font-bold text-[#0B1F3A]">
+                {{.SJ}}
+            </span>
+        </div>
+
+        <a
+            href="/outbound/sj?sj={{.SJ}}"
+            class="inline-block mt-5 bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-6 py-3 rounded-xl font-semibold"
+        >
+            Download Surat Jalan
+        </a>
+
+    </div>
+
+    {{end}}
+
+    <!-- FORM -->
+    <div class="bg-white rounded-3xl shadow-lg border border-pink-100 p-8">
+
+        <!-- TOP -->
+        <div class="mb-6">
+
+            <h2 class="text-2xl font-bold text-[#0B1F3A]">
+                Create Outbound
+            </h2>
+
+          
+
+        </div>
+
+        <form method="POST" action="/outbound/create">
+
+            <div id="container">
+
+                <!-- ITEM -->
+                <div class="grid grid-cols-4 gap-5 mb-5 item-row">
+
+                    <!-- PRODUCT -->
+                    <div>
+
+                        <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                            Product
+                        </label>
+
+                        <select
+                            name="product_id"
+                            class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300 productSelect"
+                            required
+                        >
+
+                            <option value="">
+                                Select Product
+                            </option>
+
+                            {{range .Products}}
+
+                            <option
+                                value="{{.ID}}"
+                                data-location="{{.LocationID}}"
+                                data-location-name="{{.Location}}"
+                                data-qty="{{.Qty}}"
+                                data-uom="{{.UOM}}"
+                            >
+                                {{.SKU}} - {{.Name}}
+                                ({{.Location}} | Stock: {{.Qty}} {{.UOM}})
+                            </option>
+
+                            {{end}}
+
+                        </select>
+
+                    </div>
+
+                    <!-- UOM -->
+                    <div>
+
+                        <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                            UOM
+                        </label>
+
+                        <input
+                            type="text"
+                            class="border border-pink-200 p-3 rounded-xl w-full bg-pink-50 uomText"
+                            placeholder="UOM"
+                            readonly
+                        >
+
+                    </div>
+
+                    <!-- LOCATION -->
+                    <div>
+
+                        <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                            Location
+                        </label>
+
+                        <input
+                            type="text"
+                            class="border border-pink-200 p-3 rounded-xl w-full bg-pink-50 locationText"
+                            placeholder="Location"
+                            readonly
+                        >
+
+                        <input
+                            type="hidden"
+                            name="location_id"
+                            class="locationID"
+                        >
+
+                    </div>
+
+                    <!-- QTY -->
+                    <div>
+
+                        <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                            Qty
+                        </label>
+
+                        <input
+                            type="number"
+                            name="qty"
+                            min="1"
+                            class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300 qtyInput"
+                            placeholder="Qty"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- BUTTON -->
+            <div class="flex gap-4 mt-6">
+
+                <button
+                    type="button"
+                    id="addBtn"
+                    class="bg-pink-300 hover:bg-pink-400 text-[#0B1F3A] px-6 py-3 rounded-xl font-semibold"
+                >
+                    + Add Item
+                </button>
+
+                <button
+                    class="bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-8 py-3 rounded-xl font-semibold"
+                >
+                    Submit
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- SCRIPT -->
+<script>
+
+function bindRow(row) {
+
+    let select = row.querySelector(".productSelect")
+
+    select.addEventListener("change", function () {
+
+        let opt = this.options[this.selectedIndex]
+
+        row.querySelector(".locationID").value =
+            opt.getAttribute("data-location")
+
+        row.querySelector(".locationText").value =
+            opt.getAttribute("data-location-name")
+
+        row.querySelector(".uomText").value =
+            opt.getAttribute("data-uom")
+
+        row.querySelector(".qtyInput").max =
+            opt.getAttribute("data-qty")
+    })
+}
+
+// INITIAL
+document.querySelectorAll(".item-row").forEach(bindRow)
+
+// ADD ROW
+document.getElementById("addBtn")
+.addEventListener("click", function () {
+
+    let container =
+        document.getElementById("container")
+
+    let firstRow =
+        container.querySelector(".item-row")
+
+    let clone =
+        firstRow.cloneNode(true)
+
+    // RESET
+    clone.querySelector(".productSelect").value = ""
+    clone.querySelector(".uomText").value = ""
+    clone.querySelector(".locationText").value = ""
+    clone.querySelector(".locationID").value = ""
+    clone.querySelector(".qtyInput").value = ""
+
+    container.appendChild(clone)
+
+    bindRow(clone)
+})
+
+</script>
+
+</body>
+</html>

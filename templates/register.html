@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Register</title>
+    <link
+        rel="icon"
+        type="image/png"
+        href="/static/img/logo.jpg"
+    >
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#081120] min-h-screen flex items-center justify-center overflow-hidden">
+
+    <!-- BACKGROUND -->
+    <div class="absolute inset-0">
+
+        <div class="absolute top-0 left-0 w-96 h-96 bg-pink-400 opacity-20 rounded-full blur-3xl"></div>
+
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-blue-400 opacity-20 rounded-full blur-3xl"></div>
+
+    </div>
+
+    <!-- REGISTER CARD -->
+    <div class="relative z-10 w-full max-w-lg">
+
+        <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-10">
+
+            <!-- TITLE -->
+            <div class="text-center mb-8">
+
+                <h1 class="text-4xl font-bold text-pink-300">
+                    Create Account
+                </h1>
+
+                <p class="text-pink-100 mt-3">
+                    Register new warehouse user
+                </p>
+
+            </div>
+
+            <!-- ERROR -->
+            {{if .Error}}
+
+            <div class="bg-red-500/20 border border-red-400 text-red-200 px-4 py-3 rounded-xl mb-5">
+
+                {{.Error}}
+
+            </div>
+
+            {{end}}
+
+            <!-- FORM -->
+            <form action="/register" method="POST">
+
+               <!-- FULL NAME -->
+<div class="mb-5">
+
+    <label class="block text-pink-100 mb-2">
+        Full Name
+    </label>
+
+    <input
+        type="text"
+        name="full_name"
+        required
+        placeholder="Enter full name"
+        class="w-full bg-white/10 border border-white/20 text-white px-5 py-4 rounded-2xl outline-none focus:border-pink-400"
+    >
+
+</div>
+
+                <!-- EMAIL -->
+                <div class="mb-5">
+
+                    <label class="block text-pink-100 mb-2">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        required
+                        placeholder="Enter email"
+                        class="w-full bg-white/10 border border-white/20 text-white px-5 py-4 rounded-2xl outline-none focus:border-pink-400"
+                    >
+
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="mb-5">
+
+                    <label class="block text-pink-100 mb-2">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        required
+                        placeholder="Enter password"
+                        class="w-full bg-white/10 border border-white/20 text-white px-5 py-4 rounded-2xl outline-none focus:border-pink-400"
+                    >
+
+                </div>
+
+                <!-- ROLE -->
+                <div class="mb-6">
+
+                    <label class="block text-pink-100 mb-2">
+                        Position
+                    </label>
+
+                    <select
+                        name="role"
+                        required
+                        class="w-full bg-white/10 border border-white/20 text-white px-5 py-4 rounded-2xl outline-none focus:border-pink-400"
+                    >
+
+                        <option value="MANAGER" class="text-black">
+                            Manager
+                        </option>
+
+                        <option value="SUPERVISOR" class="text-black">
+                            Supervisor
+                        </option>
+
+                        <option value="STAFF" class="text-black">
+                            Staff
+                        </option>
+
+                        <option value="OPERATOR" class="text-black">
+                            Operator
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- BUTTON -->
+                <button
+                    class="w-full bg-pink-400 hover:bg-pink-500 text-[#081120] font-bold py-4 rounded-2xl transition duration-300 shadow-lg"
+                >
+                    CREATE ACCOUNT
+                </button>
+
+            </form>
+
+            <!-- LOGIN -->
+            <div class="text-center mt-6">
+
+                <span class="text-pink-100">
+                    Already have account?
+                </span>
+
+                <a
+                    href="/login"
+                    class="text-pink-300 font-semibold hover:text-pink-400"
+                >
+                    Login
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

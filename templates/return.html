@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Return</title>
+    <link
+        rel="icon"
+        type="image/png"
+        href="/static/img/logo.jpg"
+    >
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-[#F5F7FB] p-10">
+
+<div class="max-w-7xl mx-auto">
+
+    <!-- ===================================================== -->
+    <!-- POPUP SUCCESS -->
+    <!-- ===================================================== -->
+    {{if eq .Msg "success"}}
+
+    <div
+        id="popup"
+        class="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-4 rounded-2xl shadow-2xl"
+    >
+        <div class="font-bold text-lg">
+            ✔ Return Submitted
+        </div>
+
+        <div class="text-sm text-green-100 mt-1">
+            Return request submitted successfully
+        </div>
+    </div>
+
+    {{end}}
+
+    {{if eq .Msg "error"}}
+
+    <div
+        id="popup"
+        class="fixed top-5 right-5 z-50 bg-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl"
+    >
+        <div class="font-bold text-lg">
+            ✖ Failed
+        </div>
+
+        <div class="text-sm text-red-100 mt-1">
+            Failed submit return request
+        </div>
+    </div>
+
+    {{end}}
+
+    {{if eq .Msg "nophoto"}}
+
+    <div
+        id="popup"
+        class="fixed top-5 right-5 z-50 bg-yellow-500 text-white px-6 py-4 rounded-2xl shadow-2xl"
+    >
+        <div class="font-bold text-lg">
+            ⚠ Photo Required
+        </div>
+
+        <div class="text-sm text-yellow-100 mt-1">
+            Upload photo evidence first
+        </div>
+    </div>
+
+    {{end}}
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+    <div class="flex justify-between items-center mb-8">
+
+        <!-- LEFT -->
+        <div class="flex items-center gap-3">
+
+            <a
+                href="/"
+                class="bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-5 py-3 rounded-xl font-semibold"
+            >
+                Back
+            </a>
+
+            <a
+                href="/return/history"
+                class="bg-pink-300 hover:bg-pink-400 text-[#0B1F3A] px-5 py-3 rounded-xl font-semibold"
+            >
+                History
+            </a>
+
+            
+            {{if or (eq .LoginRole "MANAGER") (eq .LoginRole "SUPERADMIN")}}
+            <a
+                href="/return/approval"
+                class="bg-yellow-400 hover:bg-yellow-500 text-[#0B1F3A] px-5 py-3 rounded-xl font-semibold"
+            >
+                Approval
+            </a>
+            {{end}}
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="flex items-center gap-4">
+
+            <!-- LOGIN -->
+            <div class="bg-white px-6 py-4 rounded-2xl shadow-lg">
+
+                <div class="text-sm text-gray-500">
+                    Login User
+                </div>
+
+                <div class="font-bold text-[#0B1F3A] text-lg mt-1">
+                    {{.LoginUser}}
+                </div>
+
+                <div class="text-pink-500 text-sm">
+                    {{.LoginRole}}
+                </div>
+
+            </div>
+
+            <!-- TITLE -->
+            <div class="text-right">
+
+                <h1 class="text-4xl font-bold text-[#0B1F3A]">
+                    Return
+                </h1>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- FORM CARD -->
+    <!-- ===================================================== -->
+    <div class="bg-white rounded-3xl shadow-lg border border-pink-100 p-8">
+
+        <!-- TOP -->
+        <div class="mb-6">
+
+            <h2 class="text-2xl font-bold text-[#0B1F3A]">
+                Create Return Request
+            </h2>
+        </div>
+
+        <!-- FORM -->
+        <form
+            method="POST"
+            action="/return/create"
+            enctype="multipart/form-data"
+            id="returnForm"
+        >
+
+            <div class="grid grid-cols-2 gap-5">
+
+                <!-- PRODUCT -->
+                <div>
+
+                    <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                        Product
+                    </label>
+
+                    <select
+                        id="productSelect"
+                        name="product_id"
+                        class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                        required
+                    >
+
+                        <option value="">
+                            Select Product
+                        </option>
+
+                        {{range .Products}}
+
+                        <option
+                            value="{{.ID}}"
+                            data-uom="{{.UOM}}"
+                        >
+                            {{.SKU}} - {{.Name}}
+                        </option>
+
+                        {{end}}
+
+                    </select>
+
+                </div>
+
+                <!-- LOCATION -->
+                <div>
+
+                    <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                        Location
+                    </label>
+
+                    <select
+                        name="location_id"
+                        class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                        required
+                    >
+
+                        <option value="">
+                            Select Location
+                        </option>
+
+                        {{range .Locations}}
+
+                        <option value="{{.ID}}">
+                            {{.Name}}
+                        </option>
+
+                        {{end}}
+
+                    </select>
+
+                </div>
+
+                <!-- QTY -->
+                <div>
+
+                    <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                        Qty
+                    </label>
+
+                    <input
+                        type="number"
+                        min="1"
+                        name="qty"
+                        class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                        placeholder="Qty"
+                        required
+                    >
+
+                </div>
+
+                <!-- UOM -->
+                <div>
+
+                    <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                        UOM
+                    </label>
+
+                    <input
+                        id="uomField"
+                        class="border border-pink-200 p-3 rounded-xl w-full bg-pink-50"
+                        placeholder="UOM"
+                        readonly
+                    >
+
+                </div>
+
+                <!-- REASON -->
+                <div class="col-span-2">
+
+                    <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                        Return Reason
+                    </label>
+
+                    <textarea
+                        name="reason"
+                        rows="5"
+                        class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                        placeholder="Explain why this item returned..."
+                        required
+                    ></textarea>
+
+                </div>
+
+                <!-- PHOTO -->
+                <div class="col-span-2">
+
+                    <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                        Photo Evidence
+                    </label>
+
+                    <input
+                        type="file"
+                        name="photo"
+                        id="photoInput"
+                        accept="image/*"
+                        class="border border-pink-200 p-3 rounded-xl w-full"
+                        required
+                    >
+
+                    <div class="text-sm text-gray-500 mt-2">
+                        Upload damaged item / issue evidence
+                    </div>
+
+                    <!-- PREVIEW -->
+                    <img
+                        id="previewImage"
+                        class="hidden mt-4 rounded-2xl shadow-lg max-h-72 border border-pink-200"
+                    >
+
+                </div>
+
+            </div>
+
+            <!-- BUTTON -->
+            <button
+                id="submitBtn"
+                class="mt-8 bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-8 py-3 rounded-xl font-semibold"
+            >
+                Submit Return Request
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- ===================================================== -->
+<!-- SCRIPT -->
+<!-- ===================================================== -->
+<script>
+
+// AUTO UOM
+document.getElementById("productSelect")
+.addEventListener("change", function () {
+
+    let uom =
+        this.options[this.selectedIndex]
+        .getAttribute("data-uom")
+
+    document.getElementById("uomField").value =
+        uom || ""
+})
+
+// PREVIEW IMAGE
+document.getElementById("photoInput")
+.addEventListener("change", function(e){
+
+    const file = e.target.files[0]
+
+    if(file){
+
+        const reader = new FileReader()
+
+        reader.onload = function(event){
+
+            const img =
+                document.getElementById("previewImage")
+
+            img.src = event.target.result
+
+            img.classList.remove("hidden")
+        }
+
+        reader.readAsDataURL(file)
+    }
+
+})
+
+// LOADING BUTTON
+document.getElementById("returnForm")
+.addEventListener("submit", function(){
+
+    const btn =
+        document.getElementById("submitBtn")
+
+    btn.innerHTML = "Processing..."
+
+    btn.disabled = true
+
+})
+
+// AUTO HIDE POPUP
+setTimeout(() => {
+
+    const popup =
+        document.getElementById("popup")
+
+    if(popup){
+
+        popup.style.display = "none"
+    }
+
+}, 3000)
+
+</script>
+
+</body>
+</html>

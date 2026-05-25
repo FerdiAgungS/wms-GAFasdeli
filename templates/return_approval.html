@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{.Title}}</title>
+    <link
+        rel="icon"
+        type="image/png"
+        href="/static/img/logo.jpg"
+    >
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-[#F5F7FB] p-10">
+
+<div class="max-w-7xl mx-auto">
+
+    <!-- ===================================================== -->
+    <!-- SUCCESS POPUP -->
+    <!-- ===================================================== -->
+    {{if eq .Msg "approved"}}
+
+    <div
+        id="popup"
+        class="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-4 rounded-2xl shadow-2xl"
+    >
+
+        <div class="font-bold text-lg">
+            ✔ Return Approved
+        </div>
+
+        <div class="text-sm text-green-100 mt-1">
+            Return request approved successfully
+        </div>
+
+    </div>
+
+    {{end}}
+
+    {{if eq .Msg "rejected"}}
+
+    <div
+        id="popup"
+        class="fixed top-5 right-5 z-50 bg-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl"
+    >
+
+        <div class="font-bold text-lg">
+            ✖ Return Rejected
+        </div>
+
+        <div class="text-sm text-red-100 mt-1">
+            Return request rejected successfully
+        </div>
+
+    </div>
+
+    {{end}}
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+    <div class="flex justify-between items-center mb-8">
+
+        <!-- LEFT -->
+        <div class="flex items-center gap-3">
+
+            <!-- BACK -->
+            <a
+                href="/"
+                class="bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-5 py-3 rounded-xl font-semibold transition"
+            >
+                Back
+            </a>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="flex items-center gap-4">
+
+            <!-- LOGIN USER -->
+            <div class="bg-white px-6 py-4 rounded-2xl shadow-lg">
+
+                <div class="text-sm text-gray-500">
+                    Login User
+                </div>
+
+                <div class="font-bold text-[#0B1F3A] text-lg mt-1">
+                    {{.LoginUser}}
+                </div>
+
+                <div class="text-pink-500 text-sm">
+                    {{.LoginRole}}
+                </div>
+
+            </div>
+
+            <!-- TITLE -->
+            <div class="text-right">
+
+                <h1 class="text-4xl font-bold text-[#0B1F3A]">
+                    Return Approval
+                </h1>
+
+                <p class="text-gray-500 mt-1">
+                    Approve or reject return request
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- TABLE CARD -->
+    <!-- ===================================================== -->
+    <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-pink-100">
+
+        <!-- ===================================================== -->
+        <!-- TOP BAR -->
+        <!-- ===================================================== -->
+        <div class="bg-[#0B1F3A] px-8 py-5 flex justify-between items-center">
+
+            <div>
+
+                <h2 class="text-2xl font-bold text-pink-200">
+                    Return Request List
+                </h2>
+
+                <p class="text-pink-100 text-sm mt-1">
+                    Pending, approved and rejected return request
+                </p>
+
+            </div>
+
+            <div class="bg-pink-200 text-[#0B1F3A] px-5 py-2 rounded-xl font-bold">
+
+                Total Data:
+                {{len .Data}}
+
+            </div>
+
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- EMPTY -->
+        <!-- ===================================================== -->
+        {{if eq (len .Data) 0}}
+
+        <div class="p-16 text-center">
+
+            <div class="text-6xl mb-4">
+                📦
+            </div>
+
+            <div class="text-2xl font-bold text-[#0B1F3A]">
+                No Return Request
+            </div>
+
+            <div class="text-gray-500 mt-2">
+                No return data available
+            </div>
+
+        </div>
+
+        {{else}}
+
+        <!-- ===================================================== -->
+        <!-- TABLE -->
+        <!-- ===================================================== -->
+        <div class="overflow-auto">
+
+            <table class="w-full">
+
+                <!-- HEAD -->
+                <thead class="bg-pink-50">
+
+                    <tr>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            SKU
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Product
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Qty
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            UOM
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Location
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Reason
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Photo
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Request By
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Status
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Approved By
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Date
+                        </th>
+
+                        <th class="p-5 text-center font-bold text-[#0B1F3A]">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <!-- BODY -->
+                <tbody>
+
+                    {{range .Data}}
+
+                    <tr class="border-b hover:bg-pink-50 transition">
+
+                        <!-- SKU -->
+                        <td class="p-5 font-semibold text-[#0B1F3A] whitespace-nowrap">
+                            {{.SKU}}
+                        </td>
+
+                        <!-- PRODUCT -->
+                        <td class="p-5 text-gray-700 whitespace-nowrap">
+                            {{.Name}}
+                        </td>
+
+                        <!-- QTY -->
+                        <td class="p-5 font-bold text-[#0B1F3A] text-lg">
+                            {{.Qty}}
+                        </td>
+
+                        <!-- UOM -->
+                        <td class="p-5 text-gray-700">
+                            {{.UOM}}
+                        </td>
+
+                        <!-- LOCATION -->
+                        <td class="p-5">
+
+                            <span class="bg-[#0B1F3A] text-pink-200 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap">
+                                {{.Location}}
+                            </span>
+
+                        </td>
+
+                        <!-- REASON -->
+                        <td class="p-5 text-gray-700 min-w-[250px]">
+                            {{.Reason}}
+                        </td>
+
+                        <!-- PHOTO -->
+                        <td class="p-5">
+
+                            <a
+                                href="/uploads/returns/{{.Photo}}"
+                                target="_blank"
+                            >
+
+                                <img
+                                    src="/uploads/returns/{{.Photo}}"
+                                    class="w-20 h-20 object-cover rounded-xl border border-pink-200 hover:scale-110 transition"
+                                >
+
+                            </a>
+
+                        </td>
+
+                        <!-- REQUEST BY -->
+                        <td class="p-5 text-gray-700 font-semibold whitespace-nowrap">
+                            {{.RequestBy}}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td class="p-5">
+
+                            {{if eq .Status "APPROVED"}}
+
+                            <span class="bg-green-100 text-green-600 px-4 py-2 rounded-full text-sm font-bold">
+                                APPROVED
+                            </span>
+
+                            {{else if eq .Status "REJECTED"}}
+
+                            <span class="bg-red-100 text-red-600 px-4 py-2 rounded-full text-sm font-bold">
+                                REJECTED
+                            </span>
+
+                            {{else}}
+
+                            <span class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-bold">
+                                PENDING
+                            </span>
+
+                            {{end}}
+
+                        </td>
+
+                        <!-- APPROVED BY -->
+                        <td class="p-5 whitespace-nowrap text-gray-700 font-semibold">
+                            {{.ApprovedBy}}
+                        </td>
+
+                        <!-- DATE -->
+                        <td class="p-5 whitespace-nowrap text-gray-600">
+                            {{.Date}}
+                        </td>
+
+                        <!-- ACTION -->
+                        <td class="p-5">
+
+                            <!-- ===================================================== -->
+                            <!-- HANYA MUNCUL JIKA PENDING -->
+                            <!-- ===================================================== -->
+                            {{if eq .Status "PENDING"}}
+
+                            <div class="flex gap-2 justify-center">
+
+                                <!-- APPROVE -->
+                                <a
+                                    href="/return/approve/{{.ID}}"
+                                    onclick="return confirm('Approve return request ini?')"
+                                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-semibold transition"
+                                >
+                                    Approve
+                                </a>
+
+                                <!-- REJECT -->
+                                <a
+                                    href="/return/reject/{{.ID}}"
+                                    onclick="return confirm('Reject return request ini?')"
+                                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-semibold transition"
+                                >
+                                    Reject
+                                </a>
+
+                            </div>
+
+                            {{else}}
+
+                            <!-- ===================================================== -->
+                            <!-- SUDAH APPROVED / REJECTED -->
+                            <!-- ===================================================== -->
+                            <div class="text-center">
+
+                                <span class="text-gray-400 font-semibold">
+                                    Completed
+                                </span>
+
+                            </div>
+
+                            {{end}}
+
+                        </td>
+
+                    </tr>
+
+                    {{end}}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {{end}}
+
+    </div>
+
+</div>
+
+<!-- ===================================================== -->
+<!-- AUTO HIDE POPUP -->
+<!-- ===================================================== -->
+<script>
+
+setTimeout(() => {
+
+    const popup =
+        document.getElementById("popup")
+
+    if (popup) {
+
+        popup.style.display = "none"
+    }
+
+}, 3000)
+
+</script>
+
+</body>
+</html>

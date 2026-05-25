@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{.Title}}</title>
+    <link
+        rel="icon"
+        type="image/png"
+        href="/static/img/logo.jpg"
+    >
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-[#F5F7FB] min-h-screen p-10">
+
+<div class="max-w-7xl mx-auto">
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+    <div class="flex justify-between items-center mb-8">
+
+        <div>
+
+            <h1 class="text-5xl font-bold text-[#0B1F3A]">
+                User Management
+            </h1>
+
+            <p class="text-gray-500 mt-2 text-lg">
+                Manage approved, pending, rejected and deleted users
+            </p>
+
+        </div>
+
+        <div class="flex items-center gap-4">
+
+            <!-- LOGIN USER -->
+            <div class="bg-white px-6 py-4 rounded-2xl shadow-lg">
+
+                <div class="text-sm text-gray-500">
+                    Login User
+                </div>
+
+                <div class="font-bold text-[#0B1F3A] text-lg mt-1">
+                    {{.LoginUser}}
+                </div>
+
+                <div class="text-pink-500 text-sm font-semibold">
+                    {{.LoginRole}}
+                </div>
+
+            </div>
+
+            <!-- BACK -->
+            <a
+                href="/"
+                class="bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-6 py-4 rounded-2xl font-semibold transition shadow-lg"
+            >
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- SUMMARY -->
+    <!-- ===================================================== -->
+    <div class="grid grid-cols-3 gap-6 mb-8">
+
+        <!-- TOTAL USER -->
+        <div class="bg-white rounded-3xl shadow-lg p-6">
+
+            <div class="text-gray-500">
+                Total User
+            </div>
+
+            <div class="text-5xl font-bold text-[#0B1F3A] mt-3">
+                {{len .Users}}
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- TABLE -->
+    <!-- ===================================================== -->
+    <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-pink-100">
+
+        <!-- TOP -->
+        <div class="bg-[#0B1F3A] px-8 py-6 flex justify-between items-center">
+
+            <div>
+
+                <h2 class="text-3xl font-bold text-pink-200">
+                    User List
+                </h2>
+
+                <p class="text-pink-100 text-sm mt-1">
+                    All registered users in warehouse system
+                </p>
+
+            </div>
+
+            <div class="bg-pink-200 text-[#0B1F3A] px-5 py-2 rounded-xl font-bold">
+
+                Total:
+                {{len .Users}}
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+        <div class="overflow-auto">
+
+            <table class="w-full">
+
+                <!-- HEAD -->
+                <thead class="bg-pink-50">
+
+                    <tr>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            ID
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Full Name
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Email
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Role
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Status
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Created
+                        </th>
+
+                        <th class="p-5 text-center font-bold text-[#0B1F3A]">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <!-- BODY -->
+                <tbody>
+
+                    {{range .Users}}
+
+                    <tr class="border-b hover:bg-pink-50 transition duration-150">
+
+                        <!-- ID -->
+                        <td class="p-5 font-bold text-[#0B1F3A]">
+                            {{.ID}}
+                        </td>
+
+                        <!-- FULL NAME -->
+                        <td class="p-5 font-semibold text-[#0B1F3A] whitespace-nowrap">
+                            {{.FullName}}
+                        </td>
+
+                        <!-- EMAIL -->
+                        <td class="p-5 text-gray-700">
+                            {{.Email}}
+                        </td>
+
+                        <!-- ROLE -->
+                        <td class="p-5">
+
+                            <span class="bg-[#0B1F3A] text-pink-200 px-4 py-2 rounded-full text-sm font-bold">
+                                {{.Role}}
+                            </span>
+
+                        </td>
+
+                        <!-- STATUS -->
+                        <td class="p-5">
+
+                            {{if eq .Status "ACTIVE"}}
+
+                            <span class="bg-green-100 text-green-600 px-4 py-2 rounded-full text-sm font-bold">
+                                ACTIVE
+                            </span>
+
+                            {{else if eq .Status "REJECTED"}}
+
+                            <span class="bg-red-100 text-red-600 px-4 py-2 rounded-full text-sm font-bold">
+                                REJECTED
+                            </span>
+
+                            {{else}}
+
+                            <span class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-bold">
+                                PENDING
+                            </span>
+
+                            {{end}}
+
+                        </td>
+
+                        <!-- CREATED -->
+                        <td class="p-5 whitespace-nowrap text-gray-600">
+                            {{.CreatedAt}}
+                        </td>
+
+                        <!-- ACTION -->
+                        <td class="p-5">
+
+                            <div class="flex justify-center gap-3">
+
+                                <!-- ================================= -->
+                                <!-- PENDING ONLY -->
+                                <!-- ================================= -->
+                                {{if eq .Status "PENDING"}}
+
+                                <!-- APPROVE -->
+                                <a
+                                    href="/users/approve/{{.ID}}"
+                                    onclick="return confirm('Approve user ini?')"
+                                    class="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-xl font-bold transition"
+                                >
+                                    Approve
+                                </a>
+
+                                <!-- REJECT -->
+                                <a
+                                    href="/users/reject/{{.ID}}"
+                                    onclick="return confirm('Reject user ini?')"
+                                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-xl font-bold transition"
+                                >
+                                    Reject
+                                </a>
+
+                                {{end}}
+
+                                <!-- ================================= -->
+                                <!-- DELETE -->
+                                <!-- ================================= -->
+                                <a
+                                    href="/users/delete/{{.ID}}"
+                                    onclick="return confirm('Yakin hapus user ini secara permanen?')"
+                                    class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-bold transition"
+                                >
+                                    Delete
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {{end}}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

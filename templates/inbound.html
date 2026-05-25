@@ -1,0 +1,413 @@
+<!-- inbound.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{.Title}}</title>
+    <link
+        rel="icon"
+        type="image/png"
+        href="/static/img/logo.jpg"
+    >
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-[#F5F7FB] p-10 min-h-screen">
+
+<div class="max-w-7xl mx-auto">
+
+    <!-- ===================================================== -->
+    <!-- SUCCESS POPUP -->
+    <!-- ===================================================== -->
+    {{if eq .Success "1"}}
+
+    <div
+        id="popup"
+        class="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-4 rounded-2xl shadow-2xl"
+    >
+
+        <div class="font-bold text-lg">
+            ✔ Inbound Success
+        </div>
+
+        <div class="text-sm text-green-100 mt-1">
+            Stock berhasil masuk ke warehouse
+        </div>
+
+    </div>
+
+    {{end}}
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+    <div class="flex justify-between items-center mb-8">
+
+        <!-- LEFT -->
+        <div class="flex items-center gap-4">
+
+            <!-- BACK -->
+            <a
+                href="/"
+                class="bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-5 py-3 rounded-xl font-semibold transition"
+            >
+                Back
+            </a>
+
+            <!-- DOWNLOAD -->
+            <a
+                href="/inbound/export"
+                class="bg-pink-300 hover:bg-pink-400 text-[#0B1F3A] px-5 py-3 rounded-xl font-semibold"
+            >
+                Download History
+            </a>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="text-right">
+
+            <h1 class="text-4xl font-bold text-[#0B1F3A]">
+                Inbound
+            </h1>
+
+            <p class="text-gray-500 mt-1">
+                Stock receiving process
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- FORM -->
+    <!-- ===================================================== -->
+    <div class="bg-white rounded-3xl shadow-lg border border-pink-100 p-8 mb-8">
+
+        <div class="mb-6">
+
+            <h2 class="text-2xl font-bold text-[#0B1F3A]">
+                Receive Stock
+            </h2>
+
+
+
+        </div>
+
+        <!-- FORM -->
+        <form
+            action="/inbound/add"
+            method="POST"
+        >
+
+            <!-- ITEM CONTAINER -->
+            <div
+                id="items-container"
+                class="space-y-5"
+            >
+
+                <!-- ITEM -->
+                <div class="grid grid-cols-4 gap-5 item-row">
+
+                    <!-- PRODUCT -->
+                    <div>
+
+                        <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                            Product
+                        </label>
+
+                        <select
+                            name="product_id[]"
+                            class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                            required
+                        >
+
+                            <option value="">
+                                Select Product
+                            </option>
+
+                            {{range .Products}}
+
+                            <option value="{{.ID}}">
+                                {{.Name}}
+                            </option>
+
+                            {{end}}
+
+                        </select>
+
+                    </div>
+
+                    <!-- LOCATION -->
+                    <div>
+
+                        <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                            Location
+                        </label>
+
+                        <select
+                            name="location_id[]"
+                            class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                            required
+                        >
+
+                            <option value="">
+                                Select Location
+                            </option>
+
+                            {{range .Locations}}
+
+                            <option value="{{.ID}}">
+                                {{.Name}}
+                            </option>
+
+                            {{end}}
+
+                        </select>
+
+                    </div>
+
+                    <!-- QTY -->
+                    <div>
+
+                        <label class="block mb-2 font-semibold text-[#0B1F3A]">
+                            Qty
+                        </label>
+
+                        <input
+                            type="number"
+                            name="qty[]"
+                            placeholder="Input Qty"
+                            class="border border-pink-200 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+                            required
+                        >
+
+                    </div>
+
+                    <!-- REMOVE -->
+                    <div class="flex items-end">
+
+                        <button
+                            type="button"
+                            onclick="removeItem(this)"
+                            class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-bold w-full"
+                        >
+                            Remove
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- BUTTON -->
+            <div class="flex gap-4 mt-8">
+
+                <!-- ADD ITEM -->
+                <button
+                    type="button"
+                    onclick="addItem()"
+                    class="bg-pink-300 hover:bg-pink-400 text-[#0B1F3A] px-6 py-3 rounded-xl font-semibold"
+                >
+                    + Add Item
+                </button>
+
+                <!-- SUBMIT -->
+                <button
+                    class="bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-8 py-3 rounded-xl font-semibold"
+                >
+                    Receive Stock
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- TABLE -->
+    <!-- ===================================================== -->
+    <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-pink-100">
+
+        <!-- TOP -->
+        <div class="bg-[#0B1F3A] px-8 py-5 flex justify-between items-center">
+
+            <div>
+
+                <h2 class="text-2xl font-bold text-pink-200">
+                    Inbound History
+                </h2>
+
+                <p class="text-pink-100 text-sm mt-1">
+                    All incoming stock transactions
+                </p>
+
+            </div>
+
+            <div class="bg-pink-200 text-[#0B1F3A] px-5 py-2 rounded-xl font-bold">
+
+                Total Data:
+                {{len .Inbounds}}
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+        <div class="overflow-auto">
+
+            <table class="w-full">
+
+                <!-- HEAD -->
+                <thead class="bg-pink-50">
+
+                    <tr>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            SKU
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            Product
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            Location
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            Qty
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            Inbound By
+                        </th>
+
+                        <th class="p-5 text-left text-[#0B1F3A] font-bold">
+                            Date Time
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <!-- BODY -->
+                <tbody>
+
+                    {{range .Inbounds}}
+
+                    <tr class="border-b hover:bg-pink-50 transition duration-150">
+
+                        <!-- SKU -->
+                        <td class="p-5 font-semibold text-[#0B1F3A]">
+                            {{.SKU}}
+                        </td>
+
+                        <!-- PRODUCT -->
+                        <td class="p-5 text-gray-700">
+                            {{.ProductName}}
+                        </td>
+
+                        <!-- LOCATION -->
+                        <td class="p-5">
+
+                            <span class="bg-[#0B1F3A] text-pink-200 px-4 py-2 rounded-full text-sm font-semibold">
+                                {{.Location}}
+                            </span>
+
+                        </td>
+
+                        <!-- QTY -->
+                        <td class="p-5 font-bold text-xl text-[#0B1F3A]">
+                            {{.Qty}}
+                        </td>
+
+                        <!-- RECEIVED -->
+                        <td class="p-5 text-gray-700 font-semibold">
+                            {{.ReceivedBy}}
+                        </td>
+
+                        <!-- DATE -->
+                        <td class="p-5 text-gray-600 whitespace-nowrap">
+                            {{.CreatedAt}}
+                        </td>
+
+                    </tr>
+
+                    {{end}}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===================================================== -->
+<!-- AUTO HIDE POPUP -->
+<!-- ===================================================== -->
+<script>
+
+setTimeout(() => {
+
+    const popup = document.getElementById("popup")
+
+    if (popup) {
+
+        popup.style.display = "none"
+    }
+
+}, 3000)
+
+</script>
+
+<!-- ===================================================== -->
+<!-- ADD ITEM -->
+<!-- ===================================================== -->
+<script>
+
+function addItem() {
+
+    const container = document.getElementById("items-container")
+
+    const item = document.querySelector(".item-row").cloneNode(true)
+
+    item.querySelectorAll("input").forEach(input => {
+        input.value = ""
+    })
+
+    item.querySelectorAll("select").forEach(select => {
+        select.selectedIndex = 0
+    })
+
+    container.appendChild(item)
+}
+
+function removeItem(button) {
+
+    const items = document.querySelectorAll(".item-row")
+
+    if (items.length > 1) {
+
+        button.closest(".item-row").remove()
+    }
+}
+
+</script>
+
+</body>
+</html>

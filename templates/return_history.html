@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>{{.Title}}</title>
+    <link
+        rel="icon"
+        type="image/png"
+        href="/static/img/logo.jpg"
+    >
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-[#F5F7FB] p-10">
+
+<div class="max-w-7xl mx-auto">
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+    <div class="flex justify-between items-center mb-8">
+
+        <!-- LEFT -->
+        <div class="flex items-center gap-3">
+
+            <a
+                href="/return"
+                class="bg-[#0B1F3A] hover:bg-[#10284a] text-pink-200 px-5 py-3 rounded-xl font-semibold"
+            >
+                Back Return
+            </a>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="flex items-center gap-4">
+
+            <!-- LOGIN -->
+            <div class="bg-white px-6 py-4 rounded-2xl shadow-lg">
+
+                <div class="text-sm text-gray-500">
+                    Login User
+                </div>
+
+                <div class="font-bold text-[#0B1F3A] text-lg mt-1">
+                    {{.LoginUser}}
+                </div>
+
+                <div class="text-pink-500 text-sm">
+                    {{.LoginRole}}
+                </div>
+
+            </div>
+
+            <!-- TITLE -->
+            <div class="text-right">
+
+                <h1 class="text-4xl font-bold text-[#0B1F3A]">
+                    Return History
+                </h1>
+
+                <p class="text-gray-500 mt-1">
+                    All return request history
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- TABLE -->
+    <!-- ===================================================== -->
+    <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-pink-100">
+
+        <!-- TOP -->
+        <div class="bg-[#0B1F3A] px-8 py-5 flex justify-between items-center">
+
+            <div>
+
+                <h2 class="text-2xl font-bold text-pink-200">
+                    Return History
+                </h2>
+
+                <p class="text-pink-100 text-sm mt-1">
+                    Approved, rejected and pending returns
+                </p>
+
+            </div>
+
+            <div class="bg-pink-200 text-[#0B1F3A] px-5 py-2 rounded-xl font-bold">
+
+                Total:
+                {{len .Logs}}
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+        <div class="overflow-auto">
+
+            <table class="w-full">
+
+                <!-- HEAD -->
+                <thead class="bg-pink-50">
+
+                    <tr>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            SKU
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Product
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Qty
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            UOM
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Location
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Reason
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Request By
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Approved By
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Status
+                        </th>
+
+                        <th class="p-5 text-left font-bold text-[#0B1F3A]">
+                            Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <!-- BODY -->
+                <tbody>
+
+                    {{range .Logs}}
+
+                    <tr class="border-b hover:bg-pink-50 transition">
+
+                        <!-- SKU -->
+                        <td class="p-5 font-semibold text-[#0B1F3A]">
+                            {{.SKU}}
+                        </td>
+
+                        <!-- PRODUCT -->
+                        <td class="p-5 text-gray-700">
+                            {{.Name}}
+                        </td>
+
+                        <!-- QTY -->
+                        <td class="p-5 font-bold text-[#0B1F3A]">
+                            {{.Qty}}
+                        </td>
+
+                        <!-- UOM -->
+                        <td class="p-5 text-gray-700">
+                            {{.UOM}}
+                        </td>
+
+                        <!-- LOCATION -->
+                        <td class="p-5">
+
+                            <span class="bg-[#0B1F3A] text-pink-200 px-4 py-2 rounded-full text-sm font-semibold">
+                                {{.Location}}
+                            </span>
+
+                        </td>
+
+                        <!-- REASON -->
+                        <td class="p-5 text-gray-700 max-w-xs">
+                            {{.Reason}}
+                        </td>
+
+                        <!-- REQUEST BY -->
+                        <td class="p-5 text-gray-700">
+                            {{.User}}
+                        </td>
+
+                        <!-- APPROVED BY -->
+                        <td class="p-5 text-gray-700">
+                            {{.ApprovedBy}}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td class="p-5">
+
+                            {{if eq .Status "APPROVED"}}
+
+                            <span class="bg-green-100 text-green-600 px-4 py-2 rounded-full text-sm font-bold">
+                                APPROVED
+                            </span>
+
+                            {{else if eq .Status "REJECTED"}}
+
+                            <span class="bg-red-100 text-red-600 px-4 py-2 rounded-full text-sm font-bold">
+                                REJECTED
+                            </span>
+
+                            {{else}}
+
+                            <span class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-bold">
+                                PENDING
+                            </span>
+
+                            {{end}}
+
+                        </td>
+
+                        <!-- DATE -->
+                        <td class="p-5 whitespace-nowrap text-gray-600">
+                            {{.Date}}
+                        </td>
+
+                    </tr>
+
+                    {{end}}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

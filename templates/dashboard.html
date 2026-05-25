@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>GA Fasdeli</title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="/static/img/logo.jpg"
+    >
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-[#F5F7FB] overflow-x-hidden">
+
+<div class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <div class="w-72 bg-[#0B1F3A] text-pink-200 p-6 shadow-2xl flex flex-col justify-between">
+
+        <div>
+
+            <!-- LOGO -->
+            <div class="mb-10">
+
+                <h1 class="text-3xl font-bold text-pink-300">
+                    General Affair Fasdeli
+                </h1>
+
+                <p class="text-sm text-pink-100 mt-2">
+                    Management System
+                </p>
+
+            </div>
+
+            <!-- MENU -->
+            <div class="space-y-3">
+
+                <a
+                    href="/"
+                    class="block bg-pink-400 text-[#0B1F3A] px-5 py-4 rounded-xl font-semibold shadow"
+                >
+                    📊 Dashboard
+                </a>
+
+                <a
+                    href="/products"
+                    class="block hover:bg-pink-300 hover:text-[#0B1F3A] px-5 py-4 rounded-xl transition"
+                >
+                    📦 Products
+                </a>
+
+                <a
+                    href="/inventory"
+                    class="block hover:bg-pink-300 hover:text-[#0B1F3A] px-5 py-4 rounded-xl transition"
+                >
+                    🏬 Inventory
+                </a>
+
+                <a
+                    href="/inbound"
+                    class="block hover:bg-pink-300 hover:text-[#0B1F3A] px-5 py-4 rounded-xl transition"
+                >
+                    📥 Inbound
+                </a>
+
+                <a
+                    href="/outbound"
+                    class="block hover:bg-pink-300 hover:text-[#0B1F3A] px-5 py-4 rounded-xl transition"
+                >
+                    📤 Outbound
+                </a>
+
+                <a
+                    href="/return"
+                    class="block hover:bg-pink-300 hover:text-[#0B1F3A] px-5 py-4 rounded-xl transition"
+                >
+                    🔄 Return
+                </a>
+
+               
+{{if or (eq .LoginRole "MANAGER") (eq .LoginRole "SUPERADMIN")}}
+
+<a
+    href="/return/approval"
+    class="block hover:bg-pink-300 hover:text-[#0B1F3A] px-5 py-4 rounded-xl transition"
+>
+    ✅ Return Approval
+</a>
+
+{{end}}
+                <!-- USER APPROVAL -->
+{{if or (eq .LoginRole "MANAGER") (eq .LoginRole "SUPERADMIN")}}
+
+<a
+    href="/users/approval"
+    class="block hover:bg-pink-300 hover:text-[#0B1F3A] px-5 py-4 rounded-xl transition"
+>
+    👥 User Approval
+</a>
+
+{{end}}
+
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="bg-[#132B4A] p-5 rounded-2xl mt-10">
+
+            <div class="text-sm text-pink-100">
+                Status
+            </div>
+
+            <div class="mt-3 flex items-center gap-3">
+
+                <div class="w-3 h-3 rounded-full bg-green-400 animate-pulse"></div>
+
+                <span class="font-semibold">
+                    SYSTEM ONLINE
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div class="flex-1 p-10 overflow-hidden">
+
+        <!-- HEADER -->
+        <div class="flex justify-between items-center mb-10">
+
+            <div>
+
+                <h1 class="text-5xl font-bold text-[#0B1F3A]">
+                    Dashboard
+                </h1>
+
+                <p class="text-gray-500 mt-2">
+                    Welcome to General Affair Fasdeli System
+                </p>
+
+            </div>
+
+            <!-- RIGHT HEADER -->
+<div class="flex items-center gap-4">
+
+    <!-- USER INFO -->
+    <div class="bg-white px-6 py-4 rounded-2xl shadow-lg">
+
+        <div class="text-sm text-gray-500">
+            Login User
+        </div>
+
+        <div class="text-lg font-bold text-[#0B1F3A] mt-1">
+            {{.LoginUser}}
+        </div>
+
+        <div class="text-sm text-pink-500 mt-1">
+            {{.LoginRole}}
+        </div>
+
+    </div>
+
+    <!-- CLOCK -->
+    <div class="bg-white px-6 py-4 rounded-2xl shadow-lg">
+
+        <div class="text-sm text-gray-500">
+            Live Time
+        </div>
+
+        <div
+            id="clock"
+            class="text-3xl font-bold text-[#0B1F3A]"
+        >
+            --
+        </div>
+
+    </div>
+
+    <!-- LOGOUT -->
+    <a
+        href="/logout"
+        class="bg-red-500 hover:bg-red-600 text-white px-6 py-4 rounded-2xl font-bold shadow-lg transition"
+    >
+        🚪 Logout
+    </a>
+
+    </div>
+
+</div>
+
+        <!-- KPI -->
+        <div class="grid grid-cols-4 gap-6">
+
+            <!-- SKU -->
+            <div class="bg-white rounded-2xl p-6 shadow hover:shadow-2xl transition">
+
+                <div class="flex justify-between items-center">
+
+                    <div>
+
+                        <div class="text-gray-500">
+                            Total SKU
+                        </div>
+
+                        <div class="text-5xl font-bold text-[#0B1F3A] mt-3">
+                            {{.TotalSKU}}
+                        </div>
+
+                        <div class="text-sm text-green-500 mt-2">
+                            Active Product
+                        </div>
+
+                    </div>
+
+                    <div class="text-6xl">
+                        📦
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- INVENTORY -->
+            <div class="bg-white rounded-2xl p-6 shadow hover:shadow-2xl transition">
+
+                <div class="flex justify-between items-center">
+
+                    <div>
+
+                        <div class="text-gray-500">
+                            Inventory
+                        </div>
+
+                        <div class="text-5xl font-bold text-[#0B1F3A] mt-3">
+                            {{.Qty}}
+                        </div>
+
+                        <div class="text-sm text-pink-500 mt-2">
+                            Warehouse Stock
+                        </div>
+
+                    </div>
+
+                    <div class="text-6xl">
+                        🏬
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- INBOUND -->
+            <div class="bg-white rounded-2xl p-6 shadow hover:shadow-2xl transition">
+
+                <div class="flex justify-between items-center">
+
+                    <div>
+
+                        <div class="text-gray-500">
+                            Inbound Today
+                        </div>
+
+                        <div class="text-5xl font-bold text-green-600 mt-3">
+                            {{.Inbound}}
+                        </div>
+
+                        <div class="text-sm text-green-500 mt-2">
+                            Stock In
+                        </div>
+
+                    </div>
+
+                    <div class="text-6xl">
+                        📥
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- OUTBOUND -->
+            <div class="bg-white rounded-2xl p-6 shadow hover:shadow-2xl transition">
+
+                <div class="flex justify-between items-center">
+
+                    <div>
+
+                        <div class="text-gray-500">
+                            Outbound Today
+                        </div>
+
+                        <div class="text-5xl font-bold text-red-500 mt-3">
+                            {{.Outbound}}
+                        </div>
+
+                        <div class="text-sm text-red-400 mt-2">
+                            Stock Out
+                        </div>
+
+                    </div>
+
+                    <div class="text-6xl">
+                        📤
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- SECOND ROW -->
+        <div class="grid grid-cols-3 gap-6 mt-8">
+
+            <!-- MOVEMENT -->
+            <div class="col-span-2 bg-white rounded-2xl p-6 shadow">
+
+                <div class="flex justify-between items-center mb-6">
+
+                    <h2 class="text-2xl font-bold text-[#0B1F3A]">
+                        📈 Warehouse Movement
+                    </h2>
+
+                    <div class="text-sm text-gray-500">
+                        Daily Analytics
+                    </div>
+
+                </div>
+
+                <div class="space-y-6">
+
+                    <!-- INBOUND -->
+                    <div>
+
+                        <div class="flex justify-between mb-2">
+
+                            <span class="font-semibold">
+                                Inbound
+                            </span>
+
+                            <span class="font-bold text-green-500">
+                                {{.Inbound}}
+                            </span>
+
+                        </div>
+
+                        <div class="w-full bg-gray-200 rounded-full h-4">
+
+                            <div
+                                class="bg-green-500 h-4 rounded-full"
+                                style="width:70%;"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- OUTBOUND -->
+                    <div>
+
+                        <div class="flex justify-between mb-2">
+
+                            <span class="font-semibold">
+                                Outbound
+                            </span>
+
+                            <span class="font-bold text-red-500">
+                                {{.Outbound}}
+                            </span>
+
+                        </div>
+
+                        <div class="w-full bg-gray-200 rounded-full h-4">
+
+                            <div
+                                class="bg-red-400 h-4 rounded-full"
+                                style="width:55%;"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- INVENTORY -->
+                    <div>
+
+                        <div class="flex justify-between mb-2">
+
+                            <span class="font-semibold">
+                                Inventory Capacity
+                            </span>
+
+                            <span class="font-bold text-pink-500">
+                                {{.Qty}}
+                            </span>
+
+                        </div>
+
+                        <div class="w-full bg-gray-200 rounded-full h-4">
+
+                            <div
+                                class="bg-pink-400 h-4 rounded-full"
+                                style="width:85%;"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- QUICK STATUS -->
+            <div class="bg-white rounded-2xl p-6 shadow">
+
+                <h2 class="text-2xl font-bold text-[#0B1F3A] mb-6">
+                    ⚡ Quick Status
+                </h2>
+
+                <div class="space-y-5">
+
+                    <div class="bg-pink-50 rounded-2xl p-5">
+
+                        <div class="text-sm text-gray-500">
+                            Fast Moving SKU
+                        </div>
+
+                        <div class="text-4xl font-bold text-pink-500 mt-2">
+                            {{len .TopOutbound}}
+                        </div>
+
+                    </div>
+
+                    <div class="bg-yellow-50 rounded-2xl p-5">
+
+                        <div class="text-sm text-gray-500">
+                            Low Stock Item
+                        </div>
+
+                        <div class="text-4xl font-bold text-yellow-500 mt-2">
+                            {{.LowStockCount}}
+                        </div>
+
+                    </div>
+
+                    <div class="bg-blue-50 rounded-2xl p-5">
+
+                        <div class="text-sm text-gray-500">
+                            Active Location
+                        </div>
+
+                        <div class="text-4xl font-bold text-blue-500 mt-2">
+                            {{.TotalLocation}}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ANALYTICS -->
+        <div class="grid grid-cols-3 gap-6 mt-8">
+
+            <!-- FAST MOVING -->
+            <div class="bg-white rounded-2xl p-6 shadow">
+
+                <h2 class="text-2xl font-bold text-[#0B1F3A] mb-6">
+                    🔥 Fast Moving
+                </h2>
+
+                <div class="space-y-5">
+
+                    {{range .TopOutbound}}
+
+                    <div>
+
+                        <div class="flex justify-between mb-2">
+
+                            <span class="font-medium">
+                                {{.Name}}
+                            </span>
+
+                            <span class="font-bold text-red-500">
+                                {{.Qty}}
+                            </span>
+
+                        </div>
+
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+
+                            <div
+                                class="bg-pink-400 h-3 rounded-full"
+                                style="width:70%;"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                    {{end}}
+
+                </div>
+
+            </div>
+
+            <!-- SLOW MOVING -->
+            <div class="bg-white rounded-2xl p-6 shadow">
+
+                <h2 class="text-2xl font-bold text-[#0B1F3A] mb-6">
+                    💤 Slow Moving
+                </h2>
+
+                <div class="space-y-4">
+
+                    {{range .SlowMoving}}
+
+                    <div class="bg-gray-50 rounded-xl p-4 flex justify-between">
+
+                        <span>
+                            {{.Name}}
+                        </span>
+
+                        <span class="font-bold text-gray-500">
+                            {{.Qty}}
+                        </span>
+
+                    </div>
+
+                    {{end}}
+
+                </div>
+
+            </div>
+
+            <!-- LOW STOCK -->
+            <div class="bg-white rounded-2xl p-6 shadow">
+
+                <h2 class="text-2xl font-bold text-[#0B1F3A] mb-6">
+                    ⚠ Low Stock
+                </h2>
+
+                <div class="space-y-4">
+
+                    {{range .LowStock}}
+
+                    <div class="bg-yellow-50 rounded-xl p-4 flex justify-between">
+
+                        <span>
+                            {{.Name}}
+                        </span>
+
+                        <span class="font-bold text-yellow-600">
+                            {{.Qty}}
+                        </span>
+
+                    </div>
+
+                    {{end}}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+        <div class="bg-white rounded-2xl shadow overflow-hidden mt-8">
+
+            <div class="bg-[#0B1F3A] px-6 py-5">
+
+                <h2 class="text-2xl font-bold text-pink-200">
+                    Inventory Snapshot
+                </h2>
+
+            </div>
+
+            <div class="overflow-auto">
+
+                <table class="w-full">
+
+                    <thead class="bg-pink-50">
+
+                        <tr>
+
+                            <th class="p-4 text-left">SKU</th>
+                            <th class="p-4 text-left">Product</th>
+                            <th class="p-4 text-left">Location</th>
+                            <th class="p-4 text-left">Qty</th>
+                            <th class="p-4 text-left">UOM</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {{range .Products}}
+
+                        <tr class="border-b hover:bg-pink-50">
+
+                            <td class="p-4 font-semibold">
+                                {{.SKU}}
+                            </td>
+
+                            <td class="p-4">
+                                {{.Name}}
+                            </td>
+
+                            <td class="p-4">
+                                {{.Location}}
+                            </td>
+
+                            <td class="p-4 font-bold text-[#0B1F3A]">
+                                {{.Qty}}
+                            </td>
+
+                            <td class="p-4">
+                                {{.UOM}}
+                            </td>
+
+                        </tr>
+
+                        {{end}}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function updateClock() {
+
+    const now = new Date()
+
+    document.getElementById("clock").innerHTML =
+        now.toLocaleTimeString()
+}
+
+setInterval(updateClock, 1000)
+
+updateClock()
+
+</script>
+
+</body>
+</html>
