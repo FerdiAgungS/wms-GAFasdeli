@@ -2,37 +2,43 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
-	"path/filepath"
 
 	"github.com/fasdeli/wms-GAFasdeli/config"
 	"github.com/fasdeli/wms-GAFasdeli/handlers"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/adaptor" // Adaptor wajib untuk Vercel
 	"github.com/gofiber/template/html/v2"
 )
 
-// Fungsi Handler ini yang akan dipanggil secara otomatis oleh Vercel
-func Handler(w http.ResponseWriter, r *http.Request) {
-	// 1. Inisialisasi Database tiap kali fungsi dipanggil
+func main() {
+
+	// =====================================================
+	// CONNECT DATABASE
+	// =====================================================
 	config.ConnectDB()
 
-	// 2. Seting HTML Engine secara absolut agar Vercel tidak bingung mencari folder
-	templateDir := filepath.Join(".", "templates")
-	engine := html.New(templateDir, ".html")
+	// =====================================================
+	// HTML ENGINE
+	// =====================================================
+	engine := html.New("./templates", ".html")
 
-	// 3. Buat App Fiber Baru
+	// =====================================================
+	// FIBER APP
+	// =====================================================
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
 
-	// 4. Folder Static
+	// =====================================================
+	// STATIC FILES
+	// =====================================================
 	app.Static("/static", "./static")
 	app.Static("/uploads", "./uploads")
 
-	// 5. Rute Aplikasi (Sama persis seperti kodingan lu sebelumnya)
+	// =====================================================
+	// ROOT & AUTH ROUTES
+	// =====================================================
 	app.Get("/", func(c *fiber.Ctx) error {
 		user := c.Cookies("user")
 		if user == "" {
@@ -56,7 +62,11 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	app.Post("/register", handlers.Register)
 	app.Get("/logout", handlers.Logout)
 
+	// =====================================================
+	// PROTECTED ROUTES
+	// =====================================================
 	auth := app.Group("/", handlers.AuthMiddleware)
+
 	auth.Get("/dashboard", handlers.DashboardPage)
 	auth.Get("/products", handlers.ProductPage)
 	auth.Post("/products/add", handlers.AddProduct)
@@ -78,7 +88,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	auth.Get("/inbound/export", handlers.ExportInboundHistory)
 
 	auth.Get("/outbound", handlers.OutboundPage)
-	app.Post("/outbound/create", handlers.CreateOutbound)
+	auth.Post("/outbound/create", handlers.CreateOutbound)
 	auth.Get("/outbound/sj", handlers.DownloadSJ)
 	auth.Get("/outbound/history", handlers.OutboundHistory)
 
@@ -98,19 +108,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return c.Status(404).SendString("404 Page Not Found")
 	})
 
-	// 6. Alihkan request dari Vercel ke dalam aplikasi Fiber lu
-	adaptor.FiberApp(app).ServeHTTP(w, r)
-}
-
-// Tetap sediakan func main biasa agar aplikasi lu tetap bisa dijalankan di lokal laptop lu
-func main() {
+	// =====================================================
+	// RUN SERVER (Railway Ready)
+	// =====================================================
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "10000"
+		port = "8080"
 	}
-	log.Printf("Menjalankan server lokal di port %s", port)
 
-	// Mode lokal pake http standar biar aman
-	http.HandleFunc("/", Handler)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Printf("Aplikasi berjalan di port %s", port)
+	log.Fatal(app.Listen(":" + port))
 }
