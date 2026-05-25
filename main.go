@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"os" // Ditambahkan untuk membaca PORT dari Render
+	"os"
 
 	"github.com/fasdeli/wms-GAFasdeli/config"
 	"github.com/fasdeli/wms-GAFasdeli/handlers"
@@ -16,68 +16,50 @@ func main() {
 	// =====================================================
 	// CONNECT DATABASE
 	// =====================================================
-
 	config.ConnectDB()
 
 	// =====================================================
 	// HTML ENGINE
 	// =====================================================
-
 	engine := html.New("./templates", ".html")
 
 	// =====================================================
 	// FIBER APP
 	// =====================================================
-
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
 
 	// =====================================================
-	// STATIC FILES
+	// STATIC FILES & UPLOADS
 	// =====================================================
-
 	app.Static("/static", "./static")
-
-	// UPLOAD IMAGE
 	app.Static("/uploads", "./uploads")
 
 	// =====================================================
 	// ROOT
 	// =====================================================
-
 	app.Get("/", func(c *fiber.Ctx) error {
-
 		user := c.Cookies("user")
-
 		if user == "" {
 			return c.Redirect("/login")
 		}
-
 		return handlers.DashboardPage(c)
 	})
 
 	// =====================================================
-	// LOGIN
+	// LOGIN & REGISTER
 	// =====================================================
-
 	app.Get("/login", func(c *fiber.Ctx) error {
-
 		if c.Cookies("user") != "" {
 			return c.Redirect("/")
 		}
-
 		return c.Render("login", fiber.Map{
 			"Title": "Login",
 		})
 	})
 
-	// =====================================================
-	// REGISTER
-	// =====================================================
-
 	app.Get("/register", func(c *fiber.Ctx) error {
-
 		return c.Render("register", fiber.Map{
 			"Title": "Register",
 		})
@@ -86,191 +68,74 @@ func main() {
 	// =====================================================
 	// AUTH ACTION
 	// =====================================================
-
 	app.Post("/login", handlers.Login)
-
 	app.Post("/register", handlers.Register)
-
 	app.Get("/logout", handlers.Logout)
 
 	// =====================================================
 	// PROTECTED ROUTES
 	// =====================================================
-
 	auth := app.Group("/", handlers.AuthMiddleware)
 
-	// =====================================================
-	// DASHBOARD
-	// =====================================================
-
+	// Dashboard
 	auth.Get("/dashboard", handlers.DashboardPage)
 
-	// =====================================================
-	// PRODUCTS
-	// =====================================================
-
+	// Products
 	auth.Get("/products", handlers.ProductPage)
-
 	auth.Post("/products/add", handlers.AddProduct)
-
 	auth.Post("/products/upload", handlers.UploadProduct)
-
 	auth.Get("/products/template", handlers.DownloadTemplate)
+	auth.Get("/products/delete/:id", handlers.ManagerOnly, handlers.DeleteProduct)
 
-	auth.Get(
-		"/products/delete/:id",
-		handlers.ManagerOnly,
-		handlers.DeleteProduct,
-	)
-
-	// =====================================================
-	// INVENTORY
-	// =====================================================
-
+	// Inventory
 	auth.Get("/inventory", handlers.InventoryPage)
+	auth.Get("/inventory/export", handlers.ExportInventory)
 
-	// EXPORT INVENTORY CSV
-	auth.Get(
-		"/inventory/export",
-		handlers.ExportInventory,
-	)
+	// Stock Adjustment
+	auth.Post("/adjustment/create", handlers.CreateAdjustment)
+	auth.Get("/adjustment", handlers.ManagerOnly, handlers.AdjustmentPage)
+	auth.Get("/adjustment/approve/:id", handlers.ManagerOnly, handlers.ApproveAdjustment)
+	auth.Get("/adjustment/reject/:id", handlers.ManagerOnly, handlers.RejectAdjustment)
+	auth.Get("/adjustment/export", handlers.ManagerOnly, handlers.ExportAdjustmentHistory)
 
-	// =====================================================
-	// STOCK ADJUSTMENT
-	// =====================================================
-
-	auth.Post(
-		"/adjustment/create",
-		handlers.CreateAdjustment,
-	)
-
-	auth.Get(
-		"/adjustment",
-		handlers.ManagerOnly,
-		handlers.AdjustmentPage,
-	)
-
-	auth.Get(
-		"/adjustment/approve/:id",
-		handlers.ManagerOnly,
-		handlers.ApproveAdjustment,
-	)
-
-	auth.Get(
-		"/adjustment/reject/:id",
-		handlers.ManagerOnly,
-		handlers.RejectAdjustment,
-	)
-
-	// EXPORT ADJUSTMENT HISTORY
-	auth.Get(
-		"/adjustment/export",
-		handlers.ManagerOnly,
-		handlers.ExportAdjustmentHistory,
-	)
-
-	// =====================================================
-	// INBOUND
-	// =====================================================
-
+	// Inbound
 	auth.Get("/inbound", handlers.InboundPage)
-
 	auth.Post("/inbound/add", handlers.AddInbound)
+	auth.Get("/inbound/export", handlers.ExportInboundHistory)
 
-	// EXPORT INBOUND HISTORY
-	auth.Get(
-		"/inbound/export",
-		handlers.ExportInboundHistory,
-	)
-
-	// =====================================================
-	// OUTBOUND
-	// =====================================================
-
+	// Outbound
 	auth.Get("/outbound", handlers.OutboundPage)
-
-	auth.Post("/outbound/create", handlers.CreateOutbound)
-
+	app.Post("/outbound/create", handlers.CreateOutbound)
 	auth.Get("/outbound/sj", handlers.DownloadSJ)
-
 	auth.Get("/outbound/history", handlers.OutboundHistory)
 
-	// =====================================================
-	// RETURN
-	// =====================================================
-
+	// Return
 	auth.Get("/return", handlers.ReturnPage)
-
 	auth.Post("/return/create", handlers.CreateReturn)
+	auth.Get("/return/approval", handlers.ManagerOnly, handlers.ReturnApprovalPage)
+	auth.Get("/return/approve/:id", handlers.ManagerOnly, handlers.ApproveReturn)
+	auth.Get("/return/reject/:id", handlers.ManagerOnly, handlers.RejectReturn)
+	auth.Get("/return/history", handlers.ReturnHistory)
 
-	auth.Get(
-		"/return/approval",
-		handlers.ManagerOnly,
-		handlers.ReturnApprovalPage,
-	)
-
-	auth.Get(
-		"/return/approve/:id",
-		handlers.ManagerOnly,
-		handlers.ApproveReturn,
-	)
-
-	auth.Get(
-		"/return/reject/:id",
-		handlers.ManagerOnly,
-		handlers.RejectReturn,
-	)
-
-	auth.Get(
-		"/return/history",
-		handlers.ReturnHistory,
-	)
-
-	// =====================================================
-	// USER APPROVAL
-	// =====================================================
-
-	auth.Get(
-		"/users/approval",
-		handlers.ManagerOnly,
-		handlers.UserApprovalPage,
-	)
-
-	auth.Get(
-		"/users/approve/:id",
-		handlers.ManagerOnly,
-		handlers.ApproveUser,
-	)
-
-	auth.Get(
-		"/users/reject/:id",
-		handlers.ManagerOnly,
-		handlers.RejectUser,
-	)
-
-	auth.Get(
-		"/users/delete/:id",
-		handlers.ManagerOnly,
-		handlers.DeleteUser,
-	)
+	// User Approval
+	auth.Get("/users/approval", handlers.ManagerOnly, handlers.UserApprovalPage)
+	auth.Get("/users/approve/:id", handlers.ManagerOnly, handlers.ApproveUser)
+	auth.Get("/users/reject/:id", handlers.ManagerOnly, handlers.RejectUser)
+	auth.Get("/users/delete/:id", handlers.ManagerOnly, handlers.DeleteUser)
 
 	// =====================================================
 	// 404
 	// =====================================================
-
 	app.Use(func(c *fiber.Ctx) error {
-
 		return c.Status(404).SendString("404 Page Not Found")
 	})
 
 	// =====================================================
-	// RUN SERVER (SUDAH DISESUAIKAN UNTUK RENDER)
+	// RUN SERVER
 	// =====================================================
-
-	// Render otomatis mengirim port lewat environment variable bernama "PORT"
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "4004" // Cadangan jika dijalankan di lokal laptop kamu
+		port = "10000" // Menyesuaikan dengan port default web service Render
 	}
 
 	log.Printf("Aplikasi WMS berjalan di port %s", port)
