@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath" // Ditambahkan agar Vercel tahu lokasi folder template secara absolut
 
 	"github.com/fasdeli/wms-GAFasdeli/config"
 	"github.com/fasdeli/wms-GAFasdeli/handlers"
@@ -19,9 +20,11 @@ func main() {
 	config.ConnectDB()
 
 	// =====================================================
-	// HTML ENGINE
+	// HTML ENGINE (DIOPTIMALKAN UNTUK VERCEL)
 	// =====================================================
-	engine := html.New("./templates", ".html")
+	// Menggunakan filepath.Join agar sistem serverless tidak bingung mencari folder HTML
+	templateDir := filepath.Join(".", "templates")
+	engine := html.New(templateDir, ".html")
 
 	// =====================================================
 	// FIBER APP
@@ -135,7 +138,7 @@ func main() {
 	// =====================================================
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "10000" // Menyesuaikan dengan port default web service Render
+		port = "10000"
 	}
 
 	log.Printf("Aplikasi WMS berjalan di port %s", port)
