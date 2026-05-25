@@ -2,46 +2,37 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
-	"path/filepath" // Ditambahkan agar Vercel tahu lokasi folder template secara absolut
+	"path/filepath"
 
 	"github.com/fasdeli/wms-GAFasdeli/config"
 	"github.com/fasdeli/wms-GAFasdeli/handlers"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor" // Adaptor wajib untuk Vercel
 	"github.com/gofiber/template/html/v2"
 )
 
-func main() {
-
-	// =====================================================
-	// CONNECT DATABASE
-	// =====================================================
+// Fungsi Handler ini yang akan dipanggil secara otomatis oleh Vercel
+func Handler(w http.ResponseWriter, r *http.Request) {
+	// 1. Inisialisasi Database tiap kali fungsi dipanggil
 	config.ConnectDB()
 
-	// =====================================================
-	// HTML ENGINE (DIOPTIMALKAN UNTUK VERCEL)
-	// =====================================================
-	// Menggunakan filepath.Join agar sistem serverless tidak bingung mencari folder HTML
+	// 2. Seting HTML Engine secara absolut agar Vercel tidak bingung mencari folder
 	templateDir := filepath.Join(".", "templates")
 	engine := html.New(templateDir, ".html")
 
-	// =====================================================
-	// FIBER APP
-	// =====================================================
+	// 3. Buat App Fiber Baru
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
 
-	// =====================================================
-	// STATIC FILES & UPLOADS
-	// =====================================================
+	// 4. Folder Static
 	app.Static("/static", "./static")
 	app.Static("/uploads", "./uploads")
 
-	// =====================================================
-	// ROOT
-	// =====================================================
+	// 5. Rute Aplikasi (Sama persis seperti kodingan lu sebelumnya)
 	app.Get("/", func(c *fiber.Ctx) error {
 		user := c.Cookies("user")
 		if user == "" {
@@ -50,69 +41,47 @@ func main() {
 		return handlers.DashboardPage(c)
 	})
 
-	// =====================================================
-	// LOGIN & REGISTER
-	// =====================================================
 	app.Get("/login", func(c *fiber.Ctx) error {
 		if c.Cookies("user") != "" {
 			return c.Redirect("/")
 		}
-		return c.Render("login", fiber.Map{
-			"Title": "Login",
-		})
+		return c.Render("login", fiber.Map{"Title": "Login"})
 	})
 
 	app.Get("/register", func(c *fiber.Ctx) error {
-		return c.Render("register", fiber.Map{
-			"Title": "Register",
-		})
+		return c.Render("register", fiber.Map{"Title": "Register"})
 	})
 
-	// =====================================================
-	// AUTH ACTION
-	// =====================================================
 	app.Post("/login", handlers.Login)
 	app.Post("/register", handlers.Register)
 	app.Get("/logout", handlers.Logout)
 
-	// =====================================================
-	// PROTECTED ROUTES
-	// =====================================================
 	auth := app.Group("/", handlers.AuthMiddleware)
-
-	// Dashboard
 	auth.Get("/dashboard", handlers.DashboardPage)
-
-	// Products
 	auth.Get("/products", handlers.ProductPage)
 	auth.Post("/products/add", handlers.AddProduct)
 	auth.Post("/products/upload", handlers.UploadProduct)
 	auth.Get("/products/template", handlers.DownloadTemplate)
 	auth.Get("/products/delete/:id", handlers.ManagerOnly, handlers.DeleteProduct)
 
-	// Inventory
 	auth.Get("/inventory", handlers.InventoryPage)
 	auth.Get("/inventory/export", handlers.ExportInventory)
 
-	// Stock Adjustment
 	auth.Post("/adjustment/create", handlers.CreateAdjustment)
 	auth.Get("/adjustment", handlers.ManagerOnly, handlers.AdjustmentPage)
 	auth.Get("/adjustment/approve/:id", handlers.ManagerOnly, handlers.ApproveAdjustment)
 	auth.Get("/adjustment/reject/:id", handlers.ManagerOnly, handlers.RejectAdjustment)
 	auth.Get("/adjustment/export", handlers.ManagerOnly, handlers.ExportAdjustmentHistory)
 
-	// Inbound
 	auth.Get("/inbound", handlers.InboundPage)
 	auth.Post("/inbound/add", handlers.AddInbound)
 	auth.Get("/inbound/export", handlers.ExportInboundHistory)
 
-	// Outbound
 	auth.Get("/outbound", handlers.OutboundPage)
 	app.Post("/outbound/create", handlers.CreateOutbound)
 	auth.Get("/outbound/sj", handlers.DownloadSJ)
 	auth.Get("/outbound/history", handlers.OutboundHistory)
 
-	// Return
 	auth.Get("/return", handlers.ReturnPage)
 	auth.Post("/return/create", handlers.CreateReturn)
 	auth.Get("/return/approval", handlers.ManagerOnly, handlers.ReturnApprovalPage)
@@ -120,27 +89,28 @@ func main() {
 	auth.Get("/return/reject/:id", handlers.ManagerOnly, handlers.RejectReturn)
 	auth.Get("/return/history", handlers.ReturnHistory)
 
-	// User Approval
 	auth.Get("/users/approval", handlers.ManagerOnly, handlers.UserApprovalPage)
 	auth.Get("/users/approve/:id", handlers.ManagerOnly, handlers.ApproveUser)
 	auth.Get("/users/reject/:id", handlers.ManagerOnly, handlers.RejectUser)
 	auth.Get("/users/delete/:id", handlers.ManagerOnly, handlers.DeleteUser)
 
-	// =====================================================
-	// 404
-	// =====================================================
 	app.Use(func(c *fiber.Ctx) error {
 		return c.Status(404).SendString("404 Page Not Found")
 	})
 
-	// =====================================================
-	// RUN SERVER
-	// =====================================================
+	// 6. Alihkan request dari Vercel ke dalam aplikasi Fiber lu
+	adaptor.FiberApp(app).ServeHTTP(w, r)
+}
+
+// Tetap sediakan func main biasa agar aplikasi lu tetap bisa dijalankan di lokal laptop lu
+func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "10000"
 	}
+	log.Printf("Menjalankan server lokal di port %s", port)
 
-	log.Printf("Aplikasi WMS berjalan di port %s", port)
-	log.Fatal(app.Listen(":" + port))
+	// Mode lokal pake http standar biar aman
+	http.HandleFunc("/", Handler)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
